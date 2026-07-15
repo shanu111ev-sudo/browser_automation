@@ -1,5 +1,10 @@
-import { UserButton } from "@clerk/nextjs"
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs"
 
 export default function Page() {
-  return <UserButton />
+  return (
+    <main className="flex min-h-svh flex-col items-start gap-3 p-6">
+      <UserButton />
+      <OrganizationSwitcher />
+    </main>
+  )
 }
