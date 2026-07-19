@@ -1,13 +1,16 @@
 "use client"
 
-import { Plus, Workflow } from "lucide-react"
+import { useTransition } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { PlusIcon, WorkflowIcon } from "lucide-react"
 
+import { generateSlug } from "@/features/workflows/lib/generate-slug"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
 import {
   SidebarGroup,
   SidebarGroupAction,
@@ -16,51 +19,73 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
   useSidebar,
 } from "@/components/ui/sidebar"
+import type { Workflow } from "@/lib/db/schema"
+import { toast } from "sonner"
 
-const workflows = [
-  "dominant-wasp",
-  "honest-reindeer",
-  "expected-llama",
-  "essential-ocelot",
-  "creepy-echidna",
-  "eastern-silkworm",
-  "cultural-lion",
-  "proud-weasel",
-  "regional-bonobo",
-]
+interface WorkflowNavProps {
+  workflows: Workflow[]
+  onCreateWorkflow: (name: string) => Promise<void>
+}
 
-export function WorkflowNav() {
+export function WorkflowNav({ workflows, onCreateWorkflow }: WorkflowNavProps) {
   const { state } = useSidebar()
+  const pathname = usePathname()
+  const [isPending, startTransition] = useTransition()
+
+  const handleCreateWorkflow = () => {
+    startTransition(async () => {
+      try {
+        await onCreateWorkflow(generateSlug())
+      } catch {
+        toast.error("Failed to create workflow")
+      }
+    })
+  }
+
+  const workflowItems = workflows.map((workflow) => (
+    <SidebarMenuItem key={workflow.id}>
+      <SidebarMenuButton
+        asChild
+        isActive={pathname === `/workflows/${workflow.id}`}
+      >
+        <Link href={`/workflows/${workflow.id}`} prefetch>
+          <span>{workflow.name}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  ))
 
   if (state === "collapsed") {
     return (
-      <SidebarGroup className="p-0">
+      <SidebarGroup>
         <SidebarGroupContent>
           <SidebarMenu>
             <SidebarMenuItem>
               <Popover>
                 <PopoverTrigger asChild>
-                  <SidebarMenuButton aria-label="Workflows" className="mx-auto">
-                    <Workflow />
+                  <SidebarMenuButton tooltip="Workflows">
+                    <WorkflowIcon />
+                    <span>Workflows</span>
                   </SidebarMenuButton>
                 </PopoverTrigger>
-                <PopoverContent side="right" align="start">
+                <PopoverContent side="right" align="start" className="p-1">
                   <SidebarMenu>
                     <SidebarMenuItem>
-                      <SidebarMenuButton className="mb-2">
-                        <Plus className="size-4" /> New workflow
+                      <SidebarMenuButton
+                        onClick={handleCreateWorkflow}
+                        disabled={isPending}
+                      >
+                        <PlusIcon />
+                        <span>New workflow</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
-                    <Separator className="mb-2" />
-                    {workflows.map((workflow, index) => (
-                      <SidebarMenuItem key={workflow}>
-                        <SidebarMenuButton isActive={index === 0}>
-                          <span>{workflow}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
+                  </SidebarMenu>
+                  <SidebarSeparator className="mx-0" />
+                  <SidebarMenu className="gap-y-0.5">
+                    {workflowItems}
                   </SidebarMenu>
                 </PopoverContent>
               </Popover>
@@ -72,30 +97,18 @@ export function WorkflowNav() {
   }
 
   return (
-    <SidebarGroup className="p-0">
-      <SidebarGroupLabel className="h-9 px-3 text-base font-semibold text-[#a4a4a4]">
-        Workflows
-      </SidebarGroupLabel>
+    <SidebarGroup>
+      <SidebarGroupLabel>Workflows</SidebarGroupLabel>
       <SidebarGroupAction
-        aria-label="Create workflow"
-        className="top-1.5 right-2 size-7 text-[#a4a4a4] hover:bg-white/10 hover:text-white"
+        title="New workflow"
+        onClick={handleCreateWorkflow}
+        disabled={isPending}
       >
-        <Plus className="size-4" />
+        <PlusIcon />
+        <span className="sr-only">New workflow</span>
       </SidebarGroupAction>
       <SidebarGroupContent>
-        <SidebarMenu className="gap-1">
-          {workflows.map((workflow, index) => (
-            <SidebarMenuItem key={workflow}>
-              <SidebarMenuButton
-                isActive={index === 0}
-                className="h-9 rounded-lg px-3 text-sm font-medium text-[#d7d7d7] hover:bg-[#282828] hover:text-white data-active:bg-[#282828] data-active:text-white"
-                tooltip={workflow}
-              >
-                <span>{workflow}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+        <SidebarMenu className="gap-y-0.5">{workflowItems}</SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
   )

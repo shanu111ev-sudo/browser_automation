@@ -1,4 +1,6 @@
+import * as React from "react"
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs"
+import { auth } from "@clerk/nextjs/server"
 
 import {
   Sidebar,
@@ -6,72 +8,54 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { createWorkflowAction } from "@/features/workflows/actions"
 import { WorkflowNav } from "@/features/workflows/components/workflow-nav"
+import { listWorkflows } from "@/features/workflows/data"
 
-export function AppSidebar() {
+export async function AppSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
+  const { orgId } = await auth()
+  const workflows = orgId ? await listWorkflows(orgId) : []
+
   return (
-    <Sidebar variant="inset" collapsible="icon">
-      <SidebarHeader className="gap-0 px-4 py-4 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-2">
-        <div className="flex h-9 items-center justify-between gap-0 group-data-[collapsible=icon]:hidden">
-          <div className="min-w-0 flex-1">
-            <OrganizationSwitcher
-              hidePersonal
-              appearance={{
-                elements: {
-                  rootBox: "w-full! min-w-0!",
-                  organizationSwitcherTrigger:
-                    "w-full min-w-0 justify-start gap-2 px-0 text-[#a4a4a4] hover:bg-transparent",
-                  organizationPreview: "min-w-0",
-                  organizationPreviewAvatarBox: "size-7 shrink-0",
-                  organizationPreviewTextContainer: "min-w-0",
-                  organizationPreviewMainIdentifier:
-                    "truncate text-sm font-semibold text-[#a4a4a4]",
-                  organizationSwitcherTriggerIcon:
-                    "size-4 shrink-0 text-[#a4a4a4]",
-                },
-              }}
-            />
-          </div>
-          {/* <SidebarTrigger className="size-2 shrink-0 text-[#a4a4a4] group-data-[collapsible=icon]:hidden hover:bg-white/10 hover:text-white text-right" /> */}
-        </div>
-        <div className="hidden h-9 w-full items-center justify-center group-data-[collapsible=icon]:flex">
-          <OrganizationSwitcher
-            hidePersonal
-            appearance={{
-              elements: {
-                rootBox:
-                  "flex size-8 items-center justify-center overflow-hidden [&_.cl-organizationPreviewTextContainer]:hidden [&_.cl-organizationSwitcherTriggerIcon]:hidden",
-                organizationSwitcherTrigger:
-                  "flex size-8 items-center justify-center gap-0 p-0 text-[#a4a4a4] hover:bg-[#282828]",
-                organizationPreview: "flex items-center justify-center",
-                organizationPreviewAvatarBox: "size-7 shrink-0",
-                organizationPreviewTextContainer: "hidden",
-                organizationSwitcherTriggerIcon: "hidden",
-              },
-            }}
-          />
-        </div>
-      </SidebarHeader>
-
-      <SidebarContent className="px-3 group-data-[collapsible=icon]:px-2">
-        <WorkflowNav />
-      </SidebarContent>
-
-      <SidebarFooter className="px-4 py-5 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-2">
-        <UserButton
-          showName
+    <Sidebar variant="inset" collapsible="icon" {...props}>
+      <SidebarHeader className="flex-row items-center justify-between gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0">
+        <OrganizationSwitcher
+          afterCreateOrganizationUrl="/"
+          afterSelectOrganizationUrl="/"
+          afterLeaveOrganizationUrl="/"
+          hidePersonal
           appearance={{
             elements: {
-              userButtonBox:
-                "gap-2 text-sm font-semibold text-[#d7d7d7] group-data-[collapsible=icon]:gap-0",
-              userButtonAvatarBox: "size-8",
-              userButtonOuterIdentifier:
-                "truncate group-data-[collapsible=icon]:hidden",
+              rootBox: "min-w-0 group-data-[collapsible=icon]:!hidden",
+              organizationSwitcherTrigger: "w-full justify-between",
+            },
+          }}
+        />
+        <SidebarTrigger />
+      </SidebarHeader>
+      <SidebarContent>
+        <WorkflowNav
+          workflows={workflows}
+          onCreateWorkflow={createWorkflowAction}
+        />
+      </SidebarContent>
+      <SidebarFooter className="group-data-[collapsible=icon]:items-center">
+        <UserButton
+          appearance={{
+            elements: {
+              rootBox: "w-full",
+              userButtonTrigger:
+                "w-full justify-start group-data-[collapsible=icon]:justify-center",
+              userButtonOuterIdentifier: "group-data-[collapsible=icon]:hidden",
             },
           }}
         />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   )

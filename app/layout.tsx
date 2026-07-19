@@ -6,6 +6,7 @@ import { Toaster } from "sonner"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -30,19 +31,21 @@ export default function RootLayout({
         geist.variable
       )}
     >
-      <body>
-        <ClerkProvider
-          appearance={{ theme: shadcn }}
-          taskUrls={{
-            "choose-organization": "/choose-organization",
-          }}
-        >
-          <ThemeProvider>
-            {children}
-            <Toaster />
-          </ThemeProvider>
-        </ClerkProvider>
-      </body>
+      <TooltipProvider>
+        <body>
+          <ClerkProvider
+            appearance={{ theme: shadcn }}
+            taskUrls={{
+              "choose-organization": "/choose-organization",
+            }}
+          >
+            <ThemeProvider>
+              {children}
+              <Toaster />
+            </ThemeProvider>
+          </ClerkProvider>
+        </body>
+      </TooltipProvider>
     </html>
   )
 }
