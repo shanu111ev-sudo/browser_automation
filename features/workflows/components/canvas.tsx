@@ -35,6 +35,17 @@ const initialNodes: StepNodeType[] = [
       values: {},
     },
   },
+  {
+    id: "open-url",
+    type: "step",
+    position: { x: 250, y: 0 },
+    data: {
+      type: "open-url",
+      kind: "action",
+      title: "Open URL",
+      values: {},
+    },
+  },
 ]
 
 const initialEdges: Edge[] = []
