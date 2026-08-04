@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
 
 export default withSentryConfig(nextConfig, {
   org: "somanth",
-  project: "browser-auto",
+  project: "strand",
 
   // Source map upload auth token (set SENTRY_AUTH_TOKEN for production builds)
   authToken: process.env.SENTRY_AUTH_TOKEN,

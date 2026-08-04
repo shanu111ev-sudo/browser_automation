@@ -2,6 +2,7 @@ import * as React from "react"
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs"
 import { auth } from "@clerk/nextjs/server"
 
+import { StrandBrand } from "@/components/strand-brand"
 import {
   Sidebar,
   SidebarContent,
@@ -22,7 +23,15 @@ export async function AppSidebar({
 
   return (
     <Sidebar variant="inset" collapsible="icon" {...props}>
-      <SidebarHeader className="flex-row items-center justify-between gap-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0">
+      <SidebarHeader className="gap-2">
+        <div className="flex items-center justify-between gap-2 group-data-[collapsible=icon]:justify-center">
+          <StrandBrand className="group-data-[collapsible=icon]:hidden" />
+          <StrandBrand
+            showWordmark={false}
+            className="hidden group-data-[collapsible=icon]:flex"
+          />
+          <SidebarTrigger />
+        </div>
         <OrganizationSwitcher
           afterCreateOrganizationUrl="/"
           afterSelectOrganizationUrl="/"
@@ -30,12 +39,11 @@ export async function AppSidebar({
           hidePersonal
           appearance={{
             elements: {
-              rootBox: "min-w-0 group-data-[collapsible=icon]:!hidden",
+              rootBox: "min-w-0 w-full group-data-[collapsible=icon]:!hidden",
               organizationSwitcherTrigger: "w-full justify-between",
             },
           }}
         />
-        <SidebarTrigger />
       </SidebarHeader>
       <SidebarContent>
         <WorkflowNav

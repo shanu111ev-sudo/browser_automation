@@ -2,6 +2,7 @@ import { ClerkProvider } from "@clerk/nextjs"
 import { shadcn } from "@clerk/ui/themes"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Toaster } from "sonner"
+import type { Metadata } from "next"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -14,6 +15,19 @@ const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 })
+
+export const metadata: Metadata = {
+  title: {
+    default: "Strand",
+    template: "%s · Strand",
+  },
+  description: "Build and run collaborative browser automation workflows.",
+  applicationName: "Strand",
+  icons: {
+    icon: [{ url: "/favicon.ico" }, { url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/apple-icon.png" }],
+  },
+}
 
 export default function RootLayout({
   children,
