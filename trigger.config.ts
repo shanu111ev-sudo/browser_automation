@@ -1,4 +1,6 @@
-import { defineConfig } from "@trigger.dev/sdk";
+import { defineConfig } from "@trigger.dev/sdk"
+import { esbuildPlugin } from "@trigger.dev/build/extensions"
+import { sentryEsbuildPlugin } from "@sentry/esbuild-plugin"
 
 export default defineConfig({
   project: "proj_plfuiftnpxngszhytfsx",
@@ -18,5 +20,19 @@ export default defineConfig({
       randomize: true,
     },
   },
-  dirs: ["features"],
-});
+  // `trigger/` for init + example tasks; `features/` for domain tasks (e.g. run-workflow).
+  dirs: ["trigger", "features"],
+  build: {
+    extensions: [
+      esbuildPlugin(
+        sentryEsbuildPlugin({
+          org: "somanth",
+          project: "browser-auto",
+          // Find this auth token in Sentry → Settings → Developer Settings → Auth Tokens
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+        }),
+        { placement: "last", target: "deploy" }
+      ),
+    ],
+  },
+})
